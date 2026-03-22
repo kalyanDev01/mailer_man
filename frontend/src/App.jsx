@@ -41,12 +41,17 @@ function App() {
         // Logic to send emails goes here
         axios.post('http://localhost:5000/sendemail', { msg: emailContent, emailList: emailList })
             .then(response => {
+                if(response.data === true){
+                    alert('Emails sent successfully!');
+                } else{
+                    alert('Failed to send emails. Please try again.');
+                }
                 console.log('Response from backend:', response.data);
-                alert('Emails sent successfully!');
                 setSendStatus(false);
             })
             .catch(error => {
                 console.error('Error sending emails:', error);
+                setSendStatus(false);
             });
     }
     return (
@@ -73,5 +78,7 @@ function App() {
         </div>
     )
 }
+
+
 
 export default App
