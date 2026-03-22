@@ -8,15 +8,26 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-let isConnected = false;
+let CredsModel = null;
 
 const connectDB = async () => {
-  if (isConnected) return;
+  // Check if already connected
+  if (mongoose.connection.readyState === 1) {
+    return;
+  }
   
   try {
-    await mongoose.connect(process.env.MONGODB_URL);
+    await mongoose.connect(process.env.MONGODB_URL, {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
     console.log("Connected to MongoDB");
-    isConnected = true;
+    
+    // Define model only once
+    if (!CredsModel) {
+      CredsModel = mongoose.model("creds", {}, "bulkmail");
+    }
   } catch (err) {
     console.error("Error connecting to MongoDB:", err);
     throw err;
@@ -29,8 +40,7 @@ app.post('/sendemail', async (req, res) => {
     
     await connectDB();
     
-    const creds = mongoose.model("creds", {}, "bulkmail");
-    const data = await creds.find().exec();
+    const data = await CredsModel.find().exec();
 
     if (!data || data.length === 0) {
       console.log("No credentials found in database.");
