@@ -39,7 +39,7 @@ function App() {
     function sendEmails() {
         setSendStatus(true);
         // Logic to send emails goes here
-        axios.post('http://localhost:5000/sendemail', { msg: emailContent, emailList: emailList })
+        axios.post('https://mailer-man-9slv.vercel.app/sendemail', { msg: emailContent, emailList: emailList })
             .then(response => {
                 if(response.data === true){
                     alert('Emails sent successfully!');
